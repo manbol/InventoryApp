@@ -20,7 +20,7 @@ jobs:
           - get_location_inventory_items
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set AWS credentials
@@ -31,8 +31,15 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
 
+      - name: Install dependencies for add_inventory_item
+        if: matrix.function == 'add_inventory_item'
+        run: |
+          pip install ulid-py -t .
+        working-directory: ./lambda/${{ matrix.function }}
+
       - name: Zip Lambda function - ${{ matrix.function }}
-        run: zip function.zip lambda_function.py
+        run: |
+          zip -r function.zip . -x "*.git*"  # include lambda_function.py and any dependencies
         working-directory: ./lambda/${{ matrix.function }}
 
       - name: Deploy Lambda function - ${{ matrix.function }}
@@ -42,6 +49,6 @@ jobs:
              --publish
         working-directory: ./lambda/${{ matrix.function }}
 
-      - name: Cleanup - ${{ matrix.function }}
+      - name: Cleanup zip - ${{ matrix.function }}
         run: rm function.zip
         working-directory: ./lambda/${{ matrix.function }}
