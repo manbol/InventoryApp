@@ -1,6 +1,13 @@
 import json
 import boto3
 import ulid
+from decimal import Decimal
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
 
 def lambda_handler(event, context):
     try:
@@ -11,16 +18,16 @@ def lambda_handler(event, context):
             'body': json.dumps("Invalid request body.")
         }
 
-    table = boto3.resource('dynamodb').Table('Inventory')
     item_id = str(ulid.new())
 
     try:
+        table = boto3.resource('dynamodb').Table('Inventory')
         table.put_item(Item={
             'id': item_id,
             'name': data['name'],
             'description': data['description'],
-            'qty_on_hand': int(data['qty_on_hand']),
-            'price': float(data['price']),
+            'qty': int(data['qty']),
+            'price': Decimal(str(data['price'])),  # ✅ Fixed
             'location_id': int(data['location_id'])
         })
 
