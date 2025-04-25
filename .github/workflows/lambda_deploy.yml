@@ -10,14 +10,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        function:
-          - get_all_inventory_items
-          - get_inventory_item
-          - add_inventory_item
-          - delete_inventory_item
-          - get_location_inventory_items
 
     steps:
       - name: Checkout code
@@ -31,25 +23,91 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
 
-      - name: Install dependencies for add_inventory_item
-        if: matrix.function == 'add_inventory_item'
-        run: |
-          pip install ulid-py -t .
-        working-directory: ./lambda/${{ matrix.function }}
+      # --- Deploy: get_all_inventory_items ---
+      - name: Zip get_all_inventory_items
+        run: zip -r function.zip . -x "*.git*"
+        working-directory: ./lambda/get_all_inventory_items
 
-      - name: Zip Lambda function - ${{ matrix.function }}
-        run: |
-          zip -r function.zip . -x "*.git*"
-        working-directory: ./lambda/${{ matrix.function }}
-
-      - name: Deploy Lambda function - ${{ matrix.function }}
+      - name: Deploy get_all_inventory_items
         run: |
           aws lambda update-function-code \
-            --function-name ${{ matrix.function }} \
+            --function-name get_all_inventory_items \
             --zip-file fileb://function.zip \
             --publish
-        working-directory: ./lambda/${{ matrix.function }}
+        working-directory: ./lambda/get_all_inventory_items
 
-      - name: Cleanup zip - ${{ matrix.function }}
+      - name: Cleanup get_all_inventory_items
         run: rm function.zip
-        working-directory: ./lambda/${{ matrix.function }}
+        working-directory: ./lambda/get_all_inventory_items
+
+      # --- Deploy: get_inventory_item ---
+      - name: Zip get_inventory_item
+        run: zip -r function.zip . -x "*.git*"
+        working-directory: ./lambda/get_inventory_item
+
+      - name: Deploy get_inventory_item
+        run: |
+          aws lambda update-function-code \
+            --function-name get_inventory_item \
+            --zip-file fileb://function.zip \
+            --publish
+        working-directory: ./lambda/get_inventory_item
+
+      - name: Cleanup get_inventory_item
+        run: rm function.zip
+        working-directory: ./lambda/get_inventory_item
+
+      # --- Deploy: add_inventory_item ---
+      - name: Install dependencies for add_inventory_item
+        run: pip install ulid-py -t .
+        working-directory: ./lambda/add_inventory_item
+
+      - name: Zip add_inventory_item
+        run: zip -r function.zip . -x "*.git*"
+        working-directory: ./lambda/add_inventory_item
+
+      - name: Deploy add_inventory_item
+        run: |
+          aws lambda update-function-code \
+            --function-name add_inventory_item \
+            --zip-file fileb://function.zip \
+            --publish
+        working-directory: ./lambda/add_inventory_item
+
+      - name: Cleanup add_inventory_item
+        run: rm function.zip
+        working-directory: ./lambda/add_inventory_item
+
+      # --- Deploy: delete_inventory_item ---
+      - name: Zip delete_inventory_item
+        run: zip -r function.zip . -x "*.git*"
+        working-directory: ./lambda/delete_inventory_item
+
+      - name: Deploy delete_inventory_item
+        run: |
+          aws lambda update-function-code \
+            --function-name delete_inventory_item \
+            --zip-file fileb://function.zip \
+            --publish
+        working-directory: ./lambda/delete_inventory_item
+
+      - name: Cleanup delete_inventory_item
+        run: rm function.zip
+        working-directory: ./lambda/delete_inventory_item
+
+      # --- Deploy: get_location_inventory_items ---
+      - name: Zip get_location_inventory_items
+        run: zip -r function.zip . -x "*.git*"
+        working-directory: ./lambda/get_location_inventory_items
+
+      - name: Deploy get_location_inventory_items
+        run: |
+          aws lambda update-function-code \
+            --function-name get_location_inventory_items \
+            --zip-file fileb://function.zip \
+            --publish
+        working-directory: ./lambda/get_location_inventory_items
+
+      - name: Cleanup get_location_inventory_items
+        run: rm function.zip
+        working-directory: ./lambda/get_location_inventory_items
