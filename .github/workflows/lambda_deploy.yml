@@ -6,6 +6,7 @@ on:
       - 'main'
     paths:
       - 'lambda/**/lambda_function.py'
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -23,7 +24,7 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
 
-      # --- Deploy: get_all_inventory_items ---
+      # --- Deploy get_all_inventory_items ---
       - name: Zip get_all_inventory_items
         run: zip -r function.zip . -x "*.git*"
         working-directory: ./lambda/get_all_inventory_items
@@ -40,7 +41,7 @@ jobs:
         run: rm function.zip
         working-directory: ./lambda/get_all_inventory_items
 
-      # --- Deploy: get_inventory_item ---
+      # --- Deploy get_inventory_item ---
       - name: Zip get_inventory_item
         run: zip -r function.zip . -x "*.git*"
         working-directory: ./lambda/get_inventory_item
@@ -57,8 +58,8 @@ jobs:
         run: rm function.zip
         working-directory: ./lambda/get_inventory_item
 
-      # --- Deploy: add_inventory_item ---
-      - name: Install dependencies for add_inventory_item
+      # --- Deploy add_inventory_item ---
+      - name: Install ulid-py for add_inventory_item
         run: pip install ulid-py -t .
         working-directory: ./lambda/add_inventory_item
 
@@ -78,7 +79,7 @@ jobs:
         run: rm function.zip
         working-directory: ./lambda/add_inventory_item
 
-      # --- Deploy: delete_inventory_item ---
+      # --- Deploy delete_inventory_item ---
       - name: Zip delete_inventory_item
         run: zip -r function.zip . -x "*.git*"
         working-directory: ./lambda/delete_inventory_item
@@ -95,7 +96,7 @@ jobs:
         run: rm function.zip
         working-directory: ./lambda/delete_inventory_item
 
-      # --- Deploy: get_location_inventory_items ---
+      # --- Deploy get_location_inventory_items ---
       - name: Zip get_location_inventory_items
         run: zip -r function.zip . -x "*.git*"
         working-directory: ./lambda/get_location_inventory_items
