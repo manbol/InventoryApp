@@ -39,14 +39,15 @@ jobs:
 
       - name: Zip Lambda function - ${{ matrix.function }}
         run: |
-          zip -r function.zip . -x "*.git*"  # include lambda_function.py and any dependencies
+          zip -r function.zip . -x "*.git*"
         working-directory: ./lambda/${{ matrix.function }}
 
       - name: Deploy Lambda function - ${{ matrix.function }}
-        run: aws lambda update-function-code \
-             --function-name ${{ matrix.function }} \
-             --zip-file fileb://function.zip \
-             --publish
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ matrix.function }} \
+            --zip-file fileb://function.zip \
+            --publish
         working-directory: ./lambda/${{ matrix.function }}
 
       - name: Cleanup zip - ${{ matrix.function }}
